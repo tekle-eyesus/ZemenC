@@ -1,0 +1,30 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model FavoriteDate {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Ethiopian date
+  ethiopianDay   Int
+  ethiopianMonth Int
+  ethiopianYear  Int
+
+  // Gregorian date
+  gregorianDay   Int
+  gregorianMonth Int
+  gregorianYear  Int
+
+  // Optional metadata
+  note String?
+} 

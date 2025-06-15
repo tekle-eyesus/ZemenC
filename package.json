@@ -1,0 +1,52 @@
+{
+  "name": "zemen-converter",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "postinstall": "prisma generate"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.10.0",
+    "@radix-ui/react-dialog": "^1.0.5",
+    "@radix-ui/react-label": "^2.0.2",
+    "@radix-ui/react-slot": "^1.0.2",
+    "@radix-ui/react-tabs": "^1.1.12",
+    "@radix-ui/react-toast": "^1.2.14",
+    "@radix-ui/react-tooltip": "^1.2.7",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.1.0",
+    "date-fns": "^4.1.0",
+    "et-calendar": "^1.1.2",
+    "et-calendar-react": "^1.1.0-9.4",
+    "ethiopian-calendar-date-converter": "^2.1.4",
+    "ethiopian-date": "^0.0.6",
+    "ethiopic-date": "^1.0.4",
+    "kenat": "^2.0.1",
+    "lucide-react": "^0.331.0",
+    "next": "^15.3.3",
+    "next-seo": "^6.4.0",
+    "next-themes": "^0.2.1",
+    "react": "^18.2.0",
+    "react-day-picker": "^9.7.0",
+    "react-dom": "^18.2.0",
+    "tailwind-merge": "^2.2.1",
+    "tailwindcss-animate": "^1.0.7"
+  },
+  "devDependencies": {
+    "@types/next": "^9.0.0",
+    "@types/node": "^20.11.19",
+    "@types/react": "^18.2.57",
+    "@types/react-dom": "^18.2.19",
+    "autoprefixer": "^10.4.17",
+    "eslint": "^8.56.0",
+    "eslint-config-next": "14.1.0",
+    "postcss": "^8.4.35",
+    "prisma": "^5.10.0",
+    "tailwindcss": "^3.4.1",
+    "typescript": "^5.3.3"
+  }
+}
