@@ -8,8 +8,13 @@ import etdate from "ethiopic-date"
 import { format } from "date-fns"
 import { EthDateTime } from "ethiopian-calendar-date-converter"
 import { getHolidaysForYear } from 'kenat'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip"
+import { Star } from "lucide-react"
+
+
 
 export function DateConverter() {
+  const [savedDates, setSavedDates] = React.useState<any[]>([]);
   const { toast } = useToast()
   const [ethiopianDate, setEthiopianDate] = React.useState({
     day: "",
@@ -24,8 +29,9 @@ export function DateConverter() {
   const [convertedDate, setConvertedDate] = React.useState("")
 
   const handleEthiopianToGregorian = () => {
+
     try {
-      const day = parseInt(ethiopianDate.day)
+      var day = parseInt(ethiopianDate.day)
       const month = parseInt(ethiopianDate.month)
       const year = parseInt(ethiopianDate.year)
 
@@ -40,8 +46,9 @@ export function DateConverter() {
       if (month < 1 || month > 13) {
         throw new Error("Month must be between 1 and 13")
       }
-
-      // Convert using ethiopian-calendar-date-converter
+      // Convert using ethiopian-calendar-date-converter, have some issues 
+      if (day != 30)
+        day += 1
       const ethDateTime = new EthDateTime(year, month, day)
       const gregorianDate = ethDateTime.toEuropeanDate()
       setConvertedDate(format(gregorianDate, "EEEE, MMMM d, yyyy"))
@@ -72,10 +79,6 @@ export function DateConverter() {
         throw new Error("Month must be between 1 and 12")
       }
 
-      // Convert using ethiopian-calendar-date-converter
-      const date = new Date(year, month - 1, day)
-      const ethDateTime = EthDateTime.fromEuropeanDate(date)
-      
       // Format date as MM/DD/YYYY for ethiopic-date library to get Amharic format
       const dateString = `${month.toString().padStart(2, '0')}/${day.toString().padStart(2, '0')}/${year}`
       const converted = etdate.convert(dateString)
@@ -88,7 +91,14 @@ export function DateConverter() {
       })
     }
   }
-
+  const handleSave = (convertedDate: any) => {
+    // Placeholder for saving logic (to be replaced with Prisma/Postgres)
+    setSavedDates((prev) => [...prev, convertedDate]);
+    toast({
+      title: "Date saved",
+      description: `The date ${convertedDate} has been saved.`,
+    });
+  };
   return (
     <Tabs defaultValue="ethiopian-to-gregorian" className="w-full">
       <TabsList className="grid w-full grid-cols-2 bg-muted">
@@ -148,10 +158,28 @@ export function DateConverter() {
             Convert to Gregorian
           </Button>
           {convertedDate && (
-            <div className="mt-4 rounded-lg border border-border bg-muted p-4">
-              <p className="text-center text-lg font-bold text-muted-foreground">
+            <div className="mt-4 rounded-lg border border-border bg-muted p-4 flex flex-row items-center justify-center gap-3 sm:flex-row flex-col">
+              <p className="text-lg font-bold text-muted-foreground break-words text-center">
                 {convertedDate}
               </p>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      aria-label="Save this date"
+                      onClick={() => handleSave(convertedDate)}
+                      className="ml-0 sm:ml-2 mt-2 sm:mt-0"
+                    >
+                      <Star className="h-6 w-6 text-yellow-500" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    Save this date
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             </div>
           )}
         </div>
@@ -205,14 +233,32 @@ export function DateConverter() {
             Convert to Ethiopian
           </Button>
           {convertedDate && (
-            <div className="mt-4 rounded-lg border border-border bg-muted p-4">
-              <p className="text-center text-lg font-bold text-muted-foreground">
+            <div className="mt-4 rounded-lg border border-border bg-muted p-4 flex flex-row items-center justify-center gap-3 sm:flex-row flex-col">
+              <p className="text-lg font-bold text-muted-foreground break-words text-center">
                 {convertedDate}
               </p>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      aria-label="Save this date"
+                      onClick={() => handleSave(convertedDate)}
+                      className="ml-0 sm:ml-2 mt-2 sm:mt-0"
+                    >
+                      <Star className="h-6 w-6 text-yellow-500" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    Save this date
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             </div>
           )}
         </div>
       </TabsContent>
     </Tabs>
   )
-} 
+}
