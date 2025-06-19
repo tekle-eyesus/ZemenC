@@ -11,7 +11,7 @@ import { getHolidaysForYear } from 'kenat';
 import { EthDateTime, } from "ethiopian-calendar-date-converter"
 import { format } from "date-fns"
 
-const allTags = ["public", "christian", "muslim", "religious", "cultural","state"]
+const allTags = ["public", "christian", "muslim", "religious", "cultural", "state"]
 
 export function HolidaysCalendar() {
   const { toast } = useToast()
@@ -19,19 +19,44 @@ export function HolidaysCalendar() {
   const [tagFilters, setTagFilters] = useState<string[]>([])
   const [favorites, setFavorites] = useState<string[]>([])
   const [holidays, setHolidays] = useState<any[]>([])
-  const currentEthYear =  EthDateTime.now().year;
+  const currentEthYear = EthDateTime.now().year;
   const startYear = currentEthYear - 5;
   const endYear = currentEthYear + 5; // 5 years ahead
 
-// In your select:
-{Array.from({ length: endYear - startYear + 1 }, (_, i) => {
-  const y = startYear + i;
-  return <option key={y} value={y}>{y}</option>;
-})}
+
+  {
+    Array.from({ length: endYear - startYear + 1 }, (_, i) => {
+      const y = startYear + i;
+      return <option key={y} value={y}>{y}</option>;
+    })
+  }
   useEffect(() => {
-    const data = getHolidaysForYear(year )
+    const data = getHolidaysForYear(year)
     setHolidays(data)
   }, [year])
+
+  // Helper to generate a unique key for a holiday (should match backend logic)
+  const getHolidayKey = (holiday: any) => {
+    const eth = holiday.ethiopian;
+    return `${eth.year}-${eth.month}-${eth.day}-${holiday.name}`;
+  };
+
+  // Fetch user's favorite dates for the selected year and set favorites state
+  useEffect(() => {
+    async function fetchFavorites() {
+      try {
+        const res = await fetch(`/api/favorite-date?year=${year}`);
+        if (res.ok) {
+          const data = await res.json();
+          // Map to keys for easy lookup
+          setFavorites(data.map((fav: any) => `${fav.ethiopianYear}-${fav.ethiopianMonth}-${fav.ethiopianDay}-${fav.note}`));
+        }
+      } catch (error) {
+        // Optionally show a toast
+      }
+    }
+    fetchFavorites();
+  }, [year]);
 
   const toggleTag = (tag: string) => {
     setTagFilters((prev) =>
@@ -39,16 +64,54 @@ export function HolidaysCalendar() {
     )
   }
 
-  const toggleFavorite = (key: string) => {
-    const isFavorite = favorites.includes(key)
-    setFavorites((prev) =>
-      isFavorite ? prev.filter((k) => k !== key) : [...prev, key]
-    )
-    toast({
-      title: isFavorite ? "Removed from favorites" : "Added to favorites",
-      description: `Holiday ${isFavorite ? "removed" : "added"} successfully.`,
-    })
-  }
+  // Save or remove favorite holiday
+  const handleToggleFavorite = async (holiday: any) => {
+    const key = getHolidayKey(holiday);
+    const isFavorite = favorites.includes(key);
+    // Prepare payload for saving
+    const eth = holiday.ethiopian;
+    const greg = new EthDateTime(eth.year, eth.month, eth.day).toEuropeanDate();
+    const payload = {
+      ethiopianDay: eth.day,
+      ethiopianMonth: eth.month,
+      ethiopianYear: eth.year,
+      gregorianDay: greg.getDate(),
+      gregorianMonth: greg.getMonth() + 1,
+      gregorianYear: greg.getFullYear(),
+      note: holiday.name,
+    };
+    try {
+      if (!isFavorite) {
+        // Save as favorite
+        const res = await fetch("/api/favorite-date", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        if (!res.ok) throw new Error("Failed to save favorite");
+        setFavorites((prev) => [...prev, key]);
+        toast({ title: "Added to favorites", description: `Holiday added successfully.` });
+      } else {
+        const res = await fetch("/api/favorite-date", {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: holiday.name,
+            isHoliday: true
+          }),
+        });
+        if (!res.ok) throw new Error("Failed to remove favorite");
+        setFavorites((prev) => prev.filter((k) => k !== key));
+        toast({ title: "Removed from favorites", description: `Holiday removed successfully.` });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to update favorite",
+        variant: "destructive",
+      });
+    }
+  };
 
   const filtered = holidays.filter((h) =>
     tagFilters.length === 0 || tagFilters.every((tag) => h.tags.includes(tag))
@@ -58,9 +121,9 @@ export function HolidaysCalendar() {
     const ethiopianDateObj = new EthDateTime(ethiopianDate.year, ethiopianDate.month, ethiopianDate.day)
     return ethiopianDateObj.toEuropeanDate().toString()
   }
-  
-  const convertDateFormat = (year:number, month:number, day:number)=>{
-    const ethDate = new EthDateTime(year,month,day)
+
+  const convertDateFormat = (year: number, month: number, day: number) => {
+    const ethDate = new EthDateTime(year, month, day)
     return ethDate.toDateString().split(",")[0]
   }
 
@@ -123,7 +186,7 @@ export function HolidaysCalendar() {
                   </td>
                   <td className="py-2 px-4">
                     {/* {holiday.ethiopian.year}/{holiday.ethiopian.month}/{holiday.ethiopian.day} */}
-                    {convertDateFormat(holiday.ethiopian.year, holiday.ethiopian.month,holiday.ethiopian.day)}
+                    {convertDateFormat(holiday.ethiopian.year, holiday.ethiopian.month, holiday.ethiopian.day)}
                   </td>
                   <td className="py-2 px-4">
                     {
@@ -139,14 +202,13 @@ export function HolidaysCalendar() {
                     <Button
                       variant="ghost"
                       size="icon"
-                      onClick={() => toggleFavorite(holiday.key)}
+                      onClick={() => handleToggleFavorite(holiday)}
                     >
                       <Star
-                        className={`h-5 w-5 ${
-                          favorites.includes(holiday.key)
-                            ? "fill-yellow-400 text-yellow-500"
-                            : "text-muted-foreground"
-                        }`}
+                        className={`h-5 w-5 ${favorites.includes(getHolidayKey(holiday))
+                          ? "fill-yellow-400 text-yellow-500"
+                          : "text-muted-foreground"
+                          }`}
                       />
                     </Button>
                   </td>

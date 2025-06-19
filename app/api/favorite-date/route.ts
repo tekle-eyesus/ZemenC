@@ -69,6 +69,7 @@ export async function PATCH(req: NextRequest) {
 
 export async function DELETE(req: NextRequest) {
   const data = await req.json();
+  console.log(data)
   const token = await getTokenFromCookies();
   if (!token) {
     return NextResponse.json(
@@ -84,15 +85,35 @@ export async function DELETE(req: NextRequest) {
     );
   }
   // Only allow deleting user's own favorite date
-  const deleted = await prisma.favoriteDate.deleteMany({
-    where: {
-      id: data.id,
-      userId: payload.userId,
-    },
-  });
-  if (deleted.count === 0) {
-    return NextResponse.json({ error: "Not found or not authorized" }, { status: 404 });
+  if (data.isHoliday || data.isHoliday != undefined) {
+    const holiday = await prisma.favoriteDate.findMany({
+      where: {
+        note: {
+          equals: data.name
+        }
+      }
+    });
+    const deleted = await prisma.favoriteDate.deleteMany({
+      where: {
+        id: holiday[0].id,
+        userId: payload.userId,
+      },
+    });
+    if (deleted.count === 0) {
+      return NextResponse.json({ error: "Not found or not authorized" }, { status: 404 });
+    }
+  } else {
+    const deleted = await prisma.favoriteDate.deleteMany({
+      where: {
+        id: data.id,
+        userId: payload.userId,
+      },
+    });
+    if (deleted.count === 0) {
+      return NextResponse.json({ error: "Not found or not authorized" }, { status: 404 });
+    }
   }
+
   return NextResponse.json({ success: true });
 }
 
