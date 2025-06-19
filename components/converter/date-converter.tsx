@@ -92,24 +92,42 @@ export function DateConverter() {
     }
   }
 
-  const handleSave = async (convertedDate: string) => {
-    var day = parseInt(ethiopianDate.day)
-    const month = parseInt(ethiopianDate.month)
-    const year = parseInt(ethiopianDate.year)
+  const handleSave = async (convertedDate: string, isEthDate: Boolean) => {
+    let payload: any = {};
+    if (isEthDate) {
+      const day = parseInt(gregorianDate.day)
+      const month = parseInt(gregorianDate.month)
+      const year = parseInt(gregorianDate.year)
 
-    const ethDateTime = new EthDateTime(year, month, day)
-    const gregorianDate = ethDateTime.toEuropeanDate()
+      const ethDate = EthDateTime.fromEuropeanDate(new Date(year, month - 1, day));
 
-    const payload = {
-      ethiopianDay: day,
-      ethiopianMonth: month,
-      ethiopianYear: year,
-      gregorianDay: gregorianDate.getDate(),
-      gregorianMonth: gregorianDate.getMonth() + 1, // JS months are 0-based
-      gregorianYear: gregorianDate.getFullYear(),
-      note: "", // Optional
-    };
+      payload = {
+        ethiopianDay: ethDate.date,
+        ethiopianMonth: ethDate.month,
+        ethiopianYear: ethDate.year,
+        gregorianDay: day,
+        gregorianMonth: month, // JS months are 0-based
+        gregorianYear: year,
+        note: "", // Optional
+      };
+    } else {
+      const day = parseInt(ethiopianDate.day)
+      const month = parseInt(ethiopianDate.month)
+      const year = parseInt(ethiopianDate.year)
 
+      const ethDateTime = new EthDateTime(year, month, day)
+      const greDate = ethDateTime.toEuropeanDate()
+
+      payload = {
+        ethiopianDay: day,
+        ethiopianMonth: month,
+        ethiopianYear: year,
+        gregorianDay: greDate.getDate(),
+        gregorianMonth: greDate.getMonth() + 1, // JS months are 0-based
+        gregorianYear: greDate.getFullYear(),
+        note: "", // Optional
+      };
+    }
     try {
       const res = await fetch("/api/favorite-date", {
         method: "POST",
@@ -203,7 +221,7 @@ export function DateConverter() {
                       variant="ghost"
                       size="icon"
                       aria-label="Save this date"
-                      onClick={() => handleSave(convertedDate)}
+                      onClick={() => handleSave(convertedDate, false)}
                       className="ml-0 sm:ml-2 mt-2 sm:mt-0"
                     >
                       <Star className="h-6 w-6 text-yellow-500" />
@@ -278,7 +296,7 @@ export function DateConverter() {
                       variant="ghost"
                       size="icon"
                       aria-label="Save this date"
-                      onClick={() => handleSave(convertedDate)}
+                      onClick={() => handleSave(convertedDate, true)}
                       className="ml-0 sm:ml-2 mt-2 sm:mt-0"
                     >
                       <Star className="h-6 w-6 text-yellow-500" />

@@ -14,7 +14,7 @@ export default function Home() {
       <main className="container mx-auto p-4 md:p-8">
         <div className="mx-auto max-w-4xl">
           <header className="mb-8 text-center">
-            <h1 className="mb-2 text-4xl font-bold text-primary">
+            <h1 className="mb-2 text-4xl font-bold text-primary dark:text-gray-300">
               ZemenConverter
             </h1>
             <p className="text-lg text-muted-foreground">
