@@ -17,7 +17,12 @@ export async function GET() {
 
     const payload = verifyToken(token)
 
-    if (!payload || !payload.userId) {
+    if (
+      !payload ||
+      typeof payload === 'string' ||
+      !('userId' in payload) ||
+      !payload.userId
+    ) {
       return NextResponse.json(
         { error: 'Invalid token' },
         { status: 401 }

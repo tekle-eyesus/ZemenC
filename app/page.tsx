@@ -5,6 +5,7 @@ import { Navbar } from "@/components/layout/navbar"
 import { MainTabs } from "@/components/layout/main-tabs"
 import { HolidaysCalendar } from "@/components/holidays/holidays-calendar"
 import { Tabs, TabsContent } from "@/components/ui/tabs"
+import FavoriteDatesTable from "@/components/favorites/favorite-dates"
 
 export default function Home() {
   return (
@@ -37,16 +38,10 @@ export default function Home() {
                 <HolidaysCalendar />
               </TabsContent>
               <TabsContent value="favorites" className="mt-6">
-                <div className="rounded-lg border border-border bg-card p-6 shadow-sm">
-                  <h2 className="text-2xl font-semibold mb-4">Favorite Dates</h2>
-                  <p className="text-muted-foreground">
-                    Sign in to save and view your favorite dates.
-                  </p>
-                </div>
+                <FavoriteDatesTable />
               </TabsContent>
             </Tabs>
           </div>
-
           <div className="mt-8">
             <AdPlaceholder />
           </div>

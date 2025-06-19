@@ -42,4 +42,17 @@ export async function setTokenCookie(token: string) {
 export async function removeTokenCookie() {
   const cookieStore = await cookies()
   cookieStore.delete('token')
-} 
+}
+
+// Helper to get token from the request (for API routes)
+export function getTokenFromRequest(req: Request) {
+  const cookieHeader = req.headers.get('cookie')
+  if (!cookieHeader) return null
+  const cookiesArr = cookieHeader.split(';').map(c => c.trim())
+  for (const cookie of cookiesArr) {
+    if (cookie.startsWith('token=')) {
+      return cookie.substring('token='.length)
+    }
+  }
+  return null
+}

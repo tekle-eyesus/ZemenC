@@ -91,14 +91,48 @@ export function DateConverter() {
       })
     }
   }
-  const handleSave = (convertedDate: any) => {
-    // Placeholder for saving logic (to be replaced with Prisma/Postgres)
-    setSavedDates((prev) => [...prev, convertedDate]);
-    toast({
-      title: "Date saved",
-      description: `The date ${convertedDate} has been saved.`,
-    });
+
+  const handleSave = async (convertedDate: string) => {
+    var day = parseInt(ethiopianDate.day)
+    const month = parseInt(ethiopianDate.month)
+    const year = parseInt(ethiopianDate.year)
+
+    const ethDateTime = new EthDateTime(year, month, day)
+    const gregorianDate = ethDateTime.toEuropeanDate()
+
+    const payload = {
+      ethiopianDay: day,
+      ethiopianMonth: month,
+      ethiopianYear: year,
+      gregorianDay: gregorianDate.getDate(),
+      gregorianMonth: gregorianDate.getMonth() + 1, // JS months are 0-based
+      gregorianYear: gregorianDate.getFullYear(),
+      note: "", // Optional
+    };
+
+    try {
+      const res = await fetch("/api/favorite-date", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (res.ok) {
+        toast({
+          title: "Date saved",
+          description: `The date has been saved to your favorites.`,
+        });
+      } else {
+        throw new Error("Failed to save date");
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to save date",
+        variant: "destructive",
+      });
+    }
   };
+
   return (
     <Tabs defaultValue="ethiopian-to-gregorian" className="w-full">
       <TabsList className="grid w-full grid-cols-2 bg-muted">
