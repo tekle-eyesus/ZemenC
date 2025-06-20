@@ -10,43 +10,60 @@ export function Navbar() {
   const { user, signOut } = useAuth()
 
   return (
-    <nav className="sticky p-3 top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex items-center h-14 max-w-screen-2xl">
-        <div className="flex mr-4">
-          <Link href="/" className="flex items-center mr-6 space-x-2">
-            {/* <Calendar className="w-6 h-6" /> */}
-            <img src="/nav-logo.png" alt="ZemenConverter" className="w-10 h-10" />
-            <span className="hidden text-lg font-bold sm:inline-block">
-              ZemenConverter
-            </span>
-          </Link>
-        </div>
-        <div className="flex items-center justify-between flex-1 space-x-2 md:justify-end">
-          <div className="flex-1 w-full md:w-auto md:flex-none">
-            {/* Add search or other nav items here */}
+    <nav className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="container max-w-screen-2xl p-2 sm:p-0">
+        {/* Desktop layout */}
+        <div className="hidden sm:flex items-center justify-between h-14">
+          <div className="flex items-center">
+            <Link href="/" className="flex items-center space-x-2">
+              <img src="/nav-logo.png" alt="ZemenConverter" className="w-10 h-10" />
+              <span className="text-xl font-bold">ZemenConverter</span>
+            </Link>
           </div>
-          <nav className="flex items-center space-x-2">
+          <div className="flex items-center gap-4">
             {user ? (
-              <div className="flex items-center gap-4">
-                <span className="text-sm text-muted-foreground">
-                  Welcome, {user.username}
-                </span>
-                <Button variant="outline" onClick={signOut}>
-                  Sign out
-                </Button>
-              </div>
+              <>
+                <span className="text-sm text-muted-foreground">Welcome, {user.username}</span>
+                <Button variant="outline" size="sm" onClick={signOut}>Sign out</Button>
+              </>
             ) : (
-              <div className="flex items-center gap-4">
+              <>
                 <Link href="/auth/signin">
-                  <Button variant="ghost">Sign in</Button>
+                  <Button variant="ghost" size="sm">Sign in</Button>
                 </Link>
                 <Link href="/auth/register">
-                  <Button>Register</Button>
+                  <Button size="sm">Register</Button>
                 </Link>
-              </div>
+              </>
             )}
             <ThemeToggle />
-          </nav>
+          </div>
+        </div>
+        {/* Mobile layout */}
+        <div className="flex sm:hidden flex-col w-full">
+          <div className="flex items-center justify-between w-full">
+            <Link href="/" className="flex items-center space-x-2">
+              <img src="/nav-logo.png" alt="ZemenConverter" className="w-8 h-8" />
+              <span className="text-lg font-bold">ZemenConverter</span>
+            </Link>
+            <div className="flex items-center gap-2">
+              {user ? (
+                <Button variant="outline" size="sm" onClick={signOut}>Sign out</Button>
+              ) : (
+                <>
+                  <Link href="/auth/signin">
+                    <Button variant="ghost" size="sm">Sign in</Button>
+                  </Link>
+                  <Link href="/auth/register">
+                    <Button size="sm">Register</Button>
+                  </Link>
+                </>
+              )}
+            </div>
+          </div>
+          <div className="flex justify-end mt-2">
+            <ThemeToggle />
+          </div>
         </div>
       </div>
     </nav>

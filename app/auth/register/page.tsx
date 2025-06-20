@@ -7,13 +7,13 @@ export default function RegisterPage() {
       <div className="mb-6 text-center">
         <h1 className="text-2xl font-bold text-foreground">Create an account</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Sign up to get started with ZemenC
+          Sign up to get started with Zemen Converter
         </p>
       </div>
       <RegisterForm />
       <p className="mt-6 text-center text-sm text-muted-foreground">
         Already have an account?{' '}
-        <Link href="/auth/signin" className="text-foreground hover:underline">
+        <Link href="/auth/signin" className="text-primary hover:underline">
           Sign in
         </Link>
       </p>

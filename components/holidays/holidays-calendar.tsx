@@ -135,7 +135,7 @@ export function HolidaysCalendar() {
           <select
             value={year}
             onChange={(e) => setYear(Number(e.target.value))}
-            className="border rounded px-2 py-1"
+            className="px-2 py-1 border rounded"
           >
             {/* five years a forward and backward */}
             {Array.from({ length: endYear - startYear + 1 }, (_, i) => {
@@ -162,67 +162,108 @@ export function HolidaysCalendar() {
         <CardHeader>
           <CardTitle>Holidays for {year} EC</CardTitle>
         </CardHeader>
-        <CardContent className="overflow-x-auto">
-          <table className="min-w-full text-sm">
-            <thead>
-              <tr className="text-left border-b">
-                <th className="py-2 px-4">Name</th>
-                <th className="py-2 px-2">Ethiopian Date</th>
-                <th className="py-2 px-4">Gregorian Date</th>
-                <th className="py-2 px-4">Tags</th>
-                <th className="py-2 px-4">Fav</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.map((holiday, index) => (
-                <tr key={index} className="border-b hover:bg-muted/50">
-                  <td className="py-2 px-4 font-semibold">
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger>{holiday.name}</TooltipTrigger>
-                        <TooltipContent>{holiday.description}</TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-                  </td>
-                  <td className="py-2 px-4">
-                    {/* {holiday.ethiopian.year}/{holiday.ethiopian.month}/{holiday.ethiopian.day} */}
-                    {convertDateFormat(holiday.ethiopian.year, holiday.ethiopian.month, holiday.ethiopian.day)}
-                  </td>
-                  <td className="py-2 px-4">
-                    {
-                      format(convertEthiopianToGregorian(holiday.ethiopian), "EEEE, MMMM d, yyyy")
-                    }
-                  </td>
-                  <td className="py-2 px-4 flex flex-wrap gap-1">
-                    {holiday.tags.map((tag: string) => (
-                      <Badge key={tag}>{tag}</Badge>
-                    ))}
-                  </td>
-                  <td className="py-2 px-4">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => handleToggleFavorite(holiday)}
-                    >
-                      <Star
-                        className={`h-5 w-5 ${favorites.includes(getHolidayKey(holiday))
-                          ? "fill-yellow-400 text-yellow-500"
-                          : "text-muted-foreground"
+        <CardContent className="p-0 overflow-x-auto">
+          {/* Table for desktop */}
+          <div className="hidden sm:block w-full sm:min-w-[600px]">
+            <table className="w-full text-xs sm:text-sm">
+              <thead>
+                <tr className="text-left border-b">
+                  <th className="px-2 py-2 sm:px-4">Name</th>
+                  <th className="px-2 py-2 sm:px-4">Ethiopian Date</th>
+                  <th className="px-2 py-2 sm:px-4">Gregorian Date</th>
+                  <th className="px-2 py-2 sm:px-4">Tags</th>
+                  <th className="px-2 py-2 sm:px-4">Fav</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.map((holiday) => (
+                  <tr key={holiday.key} className="border-b hover:bg-muted/50">
+                    <td className="py-2 px-2 sm:px-4 font-semibold max-w-[120px] truncate">
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger>{holiday.name}</TooltipTrigger>
+                          {/* <TooltipContent>{holiday.description}</TooltipContent> */}
+                        </Tooltip>
+                      </TooltipProvider>
+                    </td>
+                    <td className="px-2 py-2 sm:px-4 whitespace-nowrap">
+                      {holiday.ethiopian.year}/{holiday.ethiopian.month}/{holiday.ethiopian.day}
+                    </td>
+                    <td className="px-2 py-2 sm:px-4 whitespace-nowrap">
+                      {holiday.gregorian ? 
+                        `${holiday.gregorian.year}/${holiday.gregorian.month}/${holiday.gregorian.day}` :
+                        'N/A'
+                      }
+                    </td>
+                    <td className="flex flex-wrap gap-1 px-2 py-2 sm:px-4">
+                      {holiday.tags.map((tag: string) => (
+                        <Badge key={tag}>{tag}</Badge>
+                      ))}
+                    </td>
+                    <td className="px-2 py-2 sm:px-4">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleToggleFavorite(holiday)}
+                      >
+                        <Star
+                          className={`h-5 w-5 ${
+                            favorites.includes(holiday.key)
+                              ? "fill-yellow-400 text-yellow-500"
+                              : "text-muted-foreground"
                           }`}
-                      />
-                    </Button>
-                  </td>
-                </tr>
-              ))}
-              {filtered.length === 0 && (
-                <tr>
-                  <td colSpan={5} className="text-center py-4 text-muted-foreground">
-                    No holidays match current filters.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+                        />
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+                {filtered.length === 0 && (
+                  <tr>
+                    <td colSpan={5} className="py-4 text-center text-muted-foreground">
+                      No holidays match current filters.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+          {/* Card view for mobile */}
+          <div className="block sm:hidden">
+            {filtered.length === 0 ? (
+              <div className="py-4 text-center text-muted-foreground">
+                No holidays match current filters.
+              </div>
+            ) : (
+              <div className="flex flex-col gap-4">
+                {filtered.map((holiday) => (
+                  <div key={holiday.key} className="flex flex-col gap-2 p-4 border rounded-lg border-border bg-muted">
+                    <div className="flex items-center justify-between">
+                      <span className="text-base font-semibold">{holiday.name}</span>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleToggleFavorite(holiday)}
+                        aria-label="Toggle favorite"
+                      >
+                        <Star
+                          className={`h-5 w-5 ${
+                            favorites.includes(holiday.key)
+                              ? "fill-yellow-400 text-yellow-500"
+                              : "text-muted-foreground"
+                          }`}
+                        />
+                      </Button>
+                    </div>
+                    <div className="flex flex-col gap-1 text-xs">
+                      <div><span className="font-medium">Ethiopian Date:</span> {holiday.ethiopian.year}/{holiday.ethiopian.month}/{holiday.ethiopian.day}</div>
+                      <div><span className="font-medium">Gregorian Date:</span> {holiday.gregorian ? `${holiday.gregorian.year}/${holiday.gregorian.month}/${holiday.gregorian.day}` : 'N/A'}</div>
+                      <div className="flex flex-wrap gap-1"><span className="font-medium">Tags:</span> {holiday.tags.map((tag: string) => (<Badge key={tag}>{tag}</Badge>))}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </CardContent>
       </Card>
 

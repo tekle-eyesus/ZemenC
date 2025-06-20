@@ -13,7 +13,7 @@ export default function SignInPage() {
       <SignInForm />
       <p className="mt-6 text-center text-sm text-muted-foreground">
         Don&apos;t have an account?{' '}
-        <Link href="/auth/register" className="text-foreground hover:underline">
+        <Link href="/auth/register" className="text-primary hover:underline">
           Create one
         </Link>
       </p>
