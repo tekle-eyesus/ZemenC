@@ -64,6 +64,17 @@ export function HolidaysCalendar() {
     )
   }
 
+  const toggleFavorite = (key: string) => {
+    const isFavorite = favorites.includes(key)
+    setFavorites((prev) =>
+      isFavorite ? prev.filter((k) => k !== key) : [...prev, key]
+    )
+    toast({
+      title: isFavorite ? "Removed from favorites" : "Added to favorites",
+      description: `Holiday ${isFavorite ? "removed" : "added"} successfully.`,
+    })
+  }
+
   // Save or remove favorite holiday
   const handleToggleFavorite = async (holiday: any) => {
     const key = getHolidayKey(holiday);
@@ -151,6 +162,11 @@ export function HolidaysCalendar() {
               variant={tagFilters.includes(tag) ? "default" : "outline"}
               onClick={() => toggleTag(tag)}
               size="sm"
+              className={
+                tagFilters.includes(tag)
+                  ? "dark:bg-blue-900 dark:text-white bg-black text-white border-none font-bold shadow"
+                  : ""
+              }
             >
               {tag}
             </Button>
@@ -195,7 +211,13 @@ export function HolidaysCalendar() {
                   </td>
                   <td className="py-2 px-4 flex flex-wrap gap-1">
                     {holiday.tags.map((tag: string) => (
-                      <Badge key={tag}>{tag}</Badge>
+                      <Badge
+                        key={tag}
+                        className="dark:bg-blue-500 dark:text-white bg-blue-100 text-blue-900 hover:bg-blue-100 hover:dark:bg-blue-800"
+                        style={{ pointerEvents: 'none' }}
+                      >
+                        {tag}
+                      </Badge>
                     ))}
                   </td>
                   <td className="py-2 px-4">
