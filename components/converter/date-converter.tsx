@@ -49,7 +49,7 @@ export function DateConverter() {
         const day = parseInt(ethiopianDate.day);
         const month = parseInt(ethiopianDate.month);
         const year = parseInt(ethiopianDate.year);
-        if (isNaN(day) || isNaN(month) || isNaN(year)) return; // Prevent NaN error
+        if (isNaN(day) || isNaN(month) || isNaN(year)) return;
         const ethDateTime = new EthDateTime(year, month, day);
         const greDate = ethDateTime.toEuropeanDate();
         payload = {
@@ -99,7 +99,6 @@ export function DateConverter() {
   }, [convertedDate, tabsValue]);
 
   const handleEthiopianToGregorian = () => {
-
     try {
       var day = parseInt(ethiopianDate.day)
       const month = parseInt(ethiopianDate.month)
@@ -116,9 +115,11 @@ export function DateConverter() {
       if (month < 1 || month > 13) {
         throw new Error("Month must be between 1 and 13")
       }
+
       // Convert using ethiopian-calendar-date-converter, have some issues here
       if (day != 30)
         day += 1
+
       const ethDateTime = new EthDateTime(year, month, day)
       const gregorianDate = ethDateTime.toEuropeanDate()
       setConvertedDate(format(gregorianDate, "EEEE, MMMM d, yyyy"))
@@ -149,7 +150,9 @@ export function DateConverter() {
         throw new Error("Month must be between 1 and 12")
       }
 
-      // Format date as MM/DD/YYYY for ethiopic-date library to get Amharic format
+      const date = new Date(year, month - 1, day)
+      const ethDateTime = EthDateTime.fromEuropeanDate(date)
+
       const dateString = `${month.toString().padStart(2, '0')}/${day.toString().padStart(2, '0')}/${year}`
       const converted = etdate.convert(dateString)
       setConvertedDate(converted)
@@ -177,9 +180,9 @@ export function DateConverter() {
         ethiopianMonth: ethDate.month,
         ethiopianYear: ethDate.year,
         gregorianDay: day,
-        gregorianMonth: month, // JS months are 0-based
+        gregorianMonth: month,
         gregorianYear: year,
-        note: "", // Optional
+        note: "",
       };
     } else {
       const day = parseInt(ethiopianDate.day)
@@ -194,7 +197,7 @@ export function DateConverter() {
         ethiopianMonth: month,
         ethiopianYear: year,
         gregorianDay: greDate.getDate(),
-        gregorianMonth: greDate.getMonth() + 1, // JS months are 0-based
+        gregorianMonth: greDate.getMonth() + 1,
         gregorianYear: greDate.getFullYear(),
         note: "", // Optional
       };
@@ -255,7 +258,7 @@ export function DateConverter() {
 
   return (
     <Tabs defaultValue="ethiopian-to-gregorian" className="w-full">
-      <TabsList className="grid w-full grid-cols-2 bg-muted">
+      <TabsList className="grid grid-cols-2 w-full bg-muted">
         <TabsTrigger value="ethiopian-to-gregorian" className="data-[state=active]:bg-background">
           Ethiopian → Gregorian
         </TabsTrigger>
@@ -266,8 +269,8 @@ export function DateConverter() {
 
       <TabsContent value="ethiopian-to-gregorian" className="mt-6">
         <div className="space-y-4">
-          <div className="grid grid-cols-3 gap-4">
-            <div className="space-y-2">
+          <div className="flex flex-col gap-4 sm:grid sm:grid-cols-3">
+            <div className="space-y-1 text-sm">
               <Label htmlFor="ethiopian-day">Day</Label>
               <Input
                 id="ethiopian-day"
@@ -281,7 +284,7 @@ export function DateConverter() {
                 className="bg-background"
               />
             </div>
-            <div className="space-y-2">
+            <div className="space-y-1 text-sm">
               <Label htmlFor="ethiopian-month">Month</Label>
               <Input
                 id="ethiopian-month"
@@ -295,7 +298,7 @@ export function DateConverter() {
                 className="bg-background"
               />
             </div>
-            <div className="space-y-2">
+            <div className="space-y-1 text-sm">
               <Label htmlFor="ethiopian-year">Year</Label>
               <Input
                 id="ethiopian-year"
@@ -312,8 +315,8 @@ export function DateConverter() {
             Convert to Gregorian
           </Button>
           {convertedDate && (
-            <div className="mt-4 rounded-lg border border-border bg-muted p-4 flex flex-row items-center justify-center gap-3 sm:flex-row flex-col">
-              <p className="text-lg font-bold text-muted-foreground break-words text-center">
+            <div className="flex flex-col gap-2 justify-center items-center p-3 mt-4 w-full rounded-lg border border-border bg-muted sm:p-4 sm:flex-row sm:gap-3">
+              <p className="text-base font-bold text-center break-words sm:text-lg text-muted-foreground">
                 {convertedDate}
               </p>
               <TooltipProvider>
@@ -327,6 +330,7 @@ export function DateConverter() {
                       className="ml-0 sm:ml-2 mt-2 sm:mt-0"
                     >
                       <Star className={`h-6 w-6 ${isFavorite ? "fill-yellow-400 text-yellow-500" : "text-muted-foreground"}`} />
+
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>
@@ -341,8 +345,8 @@ export function DateConverter() {
 
       <TabsContent value="gregorian-to-ethiopian" className="mt-6">
         <div className="space-y-4">
-          <div className="grid grid-cols-3 gap-4">
-            <div className="space-y-2">
+          <div className="flex flex-col gap-4 sm:grid sm:grid-cols-3">
+            <div className="space-y-1 text-sm">
               <Label htmlFor="gregorian-day">Day</Label>
               <Input
                 id="gregorian-day"
@@ -356,7 +360,7 @@ export function DateConverter() {
                 className="bg-background"
               />
             </div>
-            <div className="space-y-2">
+            <div className="space-y-1 text-sm">
               <Label htmlFor="gregorian-month">Month</Label>
               <Input
                 id="gregorian-month"
@@ -370,7 +374,7 @@ export function DateConverter() {
                 className="bg-background"
               />
             </div>
-            <div className="space-y-2">
+            <div className="space-y-1 text-sm">
               <Label htmlFor="gregorian-year">Year</Label>
               <Input
                 id="gregorian-year"
@@ -387,8 +391,8 @@ export function DateConverter() {
             Convert to Ethiopian
           </Button>
           {convertedDate && (
-            <div className="mt-4 rounded-lg border border-border bg-muted p-4 flex flex-row items-center justify-center gap-3 sm:flex-row flex-col">
-              <p className="text-lg font-bold text-muted-foreground break-words text-center">
+            <div className="flex flex-col gap-2 justify-center items-center p-3 mt-4 w-full rounded-lg border border-border bg-muted sm:p-4 sm:flex-row sm:gap-3">
+              <p className="text-base font-bold text-center break-words sm:text-lg text-muted-foreground">
                 {convertedDate}
               </p>
               <TooltipProvider>

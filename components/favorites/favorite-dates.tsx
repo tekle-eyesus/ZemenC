@@ -113,9 +113,10 @@ export function FavoriteDatesTable() {
             <CardHeader>
                 <CardTitle>Favorite Dates</CardTitle>
             </CardHeader>
-            <CardContent className="overflow-x-auto">
-                <div className="w-full">
-                    <table className="min-w-full text-sm">
+            <CardContent className="overflow-x-auto p-0">
+                {/* Table for desktop */}
+                <div className="hidden sm:block w-full sm:min-w-[600px]">
+                    <table className="w-full text-xs sm:text-sm">
                         <thead>
                             <tr className="text-left border-b">
                                 <th className="py-2 px-2">Ethiopian Date</th>
@@ -161,7 +162,7 @@ export function FavoriteDatesTable() {
                                         <td className="py-2 px-2 whitespace-nowrap">
                                             {new Date(fav.createdAt).toLocaleDateString()}
                                         </td>
-                                        <td className="py-2 px-2 flex gap-2">
+                                        <td className="py-2 px-2">
                                             {editingId === fav.id ? (
                                                 <>
                                                     <Button size="sm" variant="outline" onClick={() => handleEditSave(fav.id)} disabled={editLoading}>
@@ -187,6 +188,103 @@ export function FavoriteDatesTable() {
                             )}
                         </tbody>
                     </table>
+                </div>
+                {/* Card view for mobile */}
+                <div className="block sm:hidden">
+                    {loading ? (
+                        <div className="text-center py-4 text-muted-foreground">Loading...</div>
+                    ) : favoriteDates.length === 0 ? (
+                        <div className="text-center py-4 text-muted-foreground">No favorite dates found.</div>
+                    ) : (
+                        <div className="flex flex-col gap-4">
+                            {favoriteDates.map((fav) => (
+                                <div
+                                    key={fav.id}
+                                    className="rounded-2xl border border-border bg-white dark:bg-muted shadow-sm p-4 flex flex-col gap-3"
+                                >
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-lg font-semibold text-foreground">
+                                                {fav.ethiopianYear}/{fav.ethiopianMonth}/{fav.ethiopianDay}
+                                            </span>
+                                            <span className="text-xs px-2 py-0.5 bg-accent text-foreground rounded-full">
+                                                Ethiopian
+                                            </span>
+                                        </div>
+                                        <div className="flex gap-2">
+                                            <Button
+                                                size="icon"
+                                                variant="ghost"
+                                                onClick={() => handleEdit(fav)}
+                                                aria-label="Edit"
+                                                className="hover:bg-accent rounded-full"
+                                            >
+                                                <Pencil className="w-4 h-4 text-muted-foreground" />
+                                            </Button>
+                                            <Button
+                                                size="icon"
+                                                variant="ghost"
+                                                onClick={() => handleDelete(fav.id)}
+                                                aria-label="Delete"
+                                                disabled={deleteLoadingId === fav.id}
+                                                className="hover:bg-red-50 rounded-full"
+                                            >
+                                                <Trash2 className="w-4 h-4 text-red-500" />
+                                            </Button>
+                                        </div>
+                                    </div>
+                                    <div className="text-sm text-muted-foreground">
+                                        <span className="font-medium text-foreground">Gregorian:</span>{" "}
+                                        {fav.gregorianYear}/{fav.gregorianMonth}/{fav.gregorianDay}
+                                    </div>
+
+                                    <div className="text-sm text-muted-foreground">
+                                        <span className="font-medium text-foreground">Note:</span>{" "}
+                                        {editingId === fav.id ? (
+                                            <input
+                                                className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-1.5 text-sm outline-none ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                                                value={editNote}
+                                                onChange={(e) => setEditNote(e.target.value)}
+                                                autoFocus
+                                                disabled={editLoading}
+                                            />
+                                        ) : fav.note ? (
+                                            <Badge >{fav.note}</Badge>
+                                        ) : (
+                                            <span className="text-muted-foreground">Add Note</span>
+                                        )}
+                                    </div>
+
+                                    {/* Created At */}
+                                    <div className="text-sm text-muted-foreground flex justify-end">
+                                        <span className="font-medium text-foreground">Added At .</span>{" "}
+                                        {new Date(fav.createdAt).toLocaleDateString()}
+                                    </div>
+                                    {editingId === fav.id && (
+                                        <div className="flex gap-2 pt-2">
+                                            <Button
+                                                size="sm"
+                                                variant="outline"
+                                                onClick={() => handleEditSave(fav.id)}
+                                                disabled={editLoading}
+                                            >
+                                                Save
+                                            </Button>
+                                            <Button
+                                                size="sm"
+                                                variant="ghost"
+                                                onClick={handleEditCancel}
+                                                disabled={editLoading}
+                                            >
+                                                Cancel
+                                            </Button>
+                                        </div>
+                                    )}
+                                </div>
+
+                            ))}
+                        </div>
+                    )}
                 </div>
             </CardContent>
         </Card>
